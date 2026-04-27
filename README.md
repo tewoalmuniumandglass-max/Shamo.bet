@@ -1,2 +1,0 @@
-# Shamo.bet
-Shamo

